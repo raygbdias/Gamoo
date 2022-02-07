@@ -1,5 +1,5 @@
 import os, discord, json, random
-from data import gamoo
+from data import Gamoo
 
 with open("token.json") as token:
     token = json.load(token)
@@ -19,7 +19,7 @@ async def on_message(message):
         await message.channel.send('list of commands goes in here')
         return
     if message.content == '!game':
-        await message.channel.send(gamoo.games)
+        await message.channel.send(Gamoo().game())
 
 
 client.run(token)
