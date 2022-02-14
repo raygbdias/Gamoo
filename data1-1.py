@@ -24,10 +24,21 @@ class Gamoo :
             valor = float(fprice)
             if valor > 0.1:
                 title = i.findChildren("a", {'class':'card-title'})[0]
-                with open("db_games.json", 'r') as file:
-                    json_file = json.load(file)
-                    file.close()
+                try:
+                    memory =  open("db_games.json", 'r')
+                    #memory.close()
+                    
                     #print(json_file)
+                except FileNotFoundError:
+                    memory =  open("db_games.json", 'w')
+                    memory.write('{"nome jogo": ["", ""]}')
+                    memory.close()
+                        
+                    memory = open("db_games.json", 'r')
+                json_file = json.load(memory)
+                memory.close()
+                #print(json_file)
+
                 if title.text not in json_file: 
                     #print(title.text)
                     url = Request('https://www.gamerpower.com/' + title['href'], headers = {'User-Agent': 'Mozilla/5.0'})
@@ -36,7 +47,7 @@ class Gamoo :
                     bs = BeautifulSoup(webpage, 'html.parser')
                     dados = bs.findChildren('div', {'class': 'card px-5 px-md-3 px-lg-5 py-4'})[0]
                     for a in dados('a', href=True):
-                        print ( 'https://www.gamerpower.com' + a['href'])
+                        url_game = 'https://www.gamerpower.com' + a['href']
                     
                     #print(dados)
                     #url_game = 'https://www.gamerpower.com/' + title['href']
@@ -45,10 +56,10 @@ class Gamoo :
                     #print(url_game)
                     print(price)
                     print('Gamoo has just found a free game for you :)')
-                    #self.games [title] = [url_game, price ] 
-                    db = open("db_games.json", 'w')
-                    json.dump(self.games, db, indent=2)
-                    db.close()
+                    self.games [title] = [url_game, price] 
+                    memory = open("db_games.json", 'w')
+                    json.dump(self.games, memory, indent=2)
+                    memory.close()
         if  len(self.games) == 0:
             return "there is no new free games, check the chat history"
         else:
