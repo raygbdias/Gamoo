@@ -2,4 +2,6 @@ map
 myvenv
 test.py
 token.json
-_pycache_
+__pycache__/
+.vscode/
+__pycache__/data.cpython-310.pyc

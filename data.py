@@ -14,8 +14,9 @@ class Gamoo :
         #nomes = dados.find_all("a", {'class':'card-title'})
 
         self.games = {}
+        self.url_game = ""
 
-    def game(self):
+    def search_game(self):
         for i in self.dados:
             #print(i)
             price = i.findChildren('span', {'class': 'text-muted'})[0].text
@@ -24,72 +25,80 @@ class Gamoo :
             valor = float(fprice)
             if valor > 0.1:
                 title = i.findChildren("a", {'class':'card-title'})[0]
-                try: 
-                    db = open("db_games.json", 'r')
-                        #print(json_file)
-
+                try:
+                    memory = open("db_games.json", 'r')
+                    #memory.close()
+                    
+                    #print(json_file)
                 except FileNotFoundError:
-                    db = open("db_games.json", 'w')
-                    db.write('[]')
-                    db = open("db_games.json", 'r')
-                    db.close()
-                json_file = json.load(db)
-                db.close()
-                if title.text not in json_file: 
-                    #print(title.text) 
-                    url = Request('https://www.gamerpower.com/' + title['href'], headers = {'User-Agent': 'Mozilla/5.0'})
-                    print(url)
-                    webpage = urlopen(url)
-                    bs = BeautifulSoup(webpage, 'html.parser')
-                    dados = bs.find_all('div', {'class': 'card px-5 px-md-3 px-lg-5 py-4'})
-                    print(dados)
-                    url_game ='s'
-
-
-                    title = title.text
-                    #print(title)
-                    #print(url_game)
-                    #print(price)
-                    #print('Gamoo has just found a free game for you :)')
-                    self.games [title] = [url_game, price ] 
-                    json.dump(self.games, db, indent=2)
-                    db.close()
+                    memory = open("db_games.json", 'w')
+                    memory.write('{"nome jogo": ["", ""]}')
+                    memory.close()
                         
-        if  len(self.games) == 0:
-            return "there is no new free games, check the chat history"
-        else:
-            #return self.games.keys(), self.games.values()
-            #return str(self.games).replace('{', '').replace('}', '').replace(']', '\n').replace('[','\n').replace('\'', '')
-            return "**teste**\n" + "https://www.gamerpower.com//daemon-x-machina-prototype-arsenal-set-dlc"
+                    memory = open("db_games.json", 'r')
+                json_file = json.load(memory)
+                #memory.close()
+                #print(json_file)
 
-Gamoo().game()
-    #dados = i.findChildren('div', {'class':'thumbnail'})
-    #link = dados[0].findChildren("a")
-    #url_game = 'https://www.gamerpower.com/' + link[0]["href"]
+                url = Request('https://www.gamerpower.com/' + title['href'], headers = {'User-Agent': 'Mozilla/5.0'})
+                #print(url)
+                webpage = urlopen(url)
+                bs = BeautifulSoup(webpage, 'html.parser')
+                dados = bs.findChildren('div', {'class': 'card px-5 px-md-3 px-lg-5 py-4'})[0]
+                if title.text not in json_file: 
+                    #print(title.text)
+                    for a in dados('a', href=True):
+                        self.url_game = 'https://www.gamerpower.com' + a['href']
+                        #print(dados)
+                        #self.url_game = 'https://www.gamerpower.com/' + title['href']
+                        title = title.text
+                        print(title)
+                        print(self.url_game)
+                        #print(price)
+                        print('Gamoo has just found a free game for you :)')
+                        if self.url_game not in json_file and title not in json_file and price not in json_file:
+                            self.games [title] = [self.url_game, price] 
+                        memory = open("db_games.json", 'r+', encoding="utf8")
+                        json_file.update(self.games)
+                        memory.seek(0)
+                        json.dump(json_file, memory, indent=2, ensure_ascii=False)
+                        memory.close()
+                        if self.url_game:
+                            return self.url_game
+                        else:
+                            return "There is no more free games, come back tomorrow"
 
-    #preco = bs.find_all('div', {'class': 'p-3'})[0]
-    #print(preco.findChildren('span', {'class': 'text-muted'}))
-    #for item in preco('span', {'class': 'text-muted'}):
-    #    numero = item.text
-    #    #print(type(numero))-
-    #    number = numero.replace('$', '')
-    #    valor = float(number)
-    #    #print(valor)
-    #    if valor > 0.1:
-    #        print('Gamoo has just found a free game for you :)')
-        
-
+                #else:
+                #    return "There is no more free games, come back tomorrow"
+                #    memory = open("db_games.json", 'w')
+                #    json.dump(self.games, memory, indent=2)
+                #    memory.close()
+                #    for a in dados('a', href=True):
+                #        self.url_game = 'https://www.gamerpower.com' + a['href']
+                #    return self.url_game
     
-        
-
-
-    #url = Request('https://www.gamerpower.com/'+ link[0]["href"], headers = {'User-Agent': 'Mozilla/5.0'})
-    #bs = BeautifulSoup(webpage, 'html.parser')
-    #data = bs.find('meta', {'property':'og:title'})
-    #'''loader = json.loads(data)
-    #print (data)
-    #pretty = json.dumps(loader,indent=4)'''
-    ##name = data[0].findChildren('title')
-    #print(data.attrs['content'])
-    
-
+        #yield url_game
+            
+        #def publish_game():
+        #    memory = open("db_games.json", 'r')
+        #    json_file = json.load(memory)
+        #    #memory.close()
+        #    if  len(json_file) == 0:
+        #        return "there is no new free games, check the chat history"
+        #    else:
+        #        #return self.games.keys(), self.games.values()
+        #        #return str(self.games).replace('{', '').replace('}', '').replace(']', '\n').replace('[','\n').replace('\'', '')
+        #        def loop():
+        #            for game, details in json_file.items():
+        #                yield game, details[0], details[1]
+        #                print(game, details[0], details[1])
+        #        def inception():
+        #            for v,k in loop():
+        #                yield v, k
+        #        
+        #        yield inception()
+        #            #return "**test**\n" + "https://www.gamerpower.com/open/free-copperbell-on-pc"
+        ##print(f"{json_file['Slapshot Rebound In-Game Currency Key ($5 Value)'][0]}")
+        #return publish_game()
+                    
+#print (Gamoo().search_game())
