@@ -19,11 +19,13 @@ async def on_message(message):
         await message.channel.send('list of commands goes in here')
         return
     if message.content == '!game':
-        if Gamoo().search_game():
-            while Gamoo().search_game():
-                await message.channel.send(Gamoo().search_game())
-        else:
-            await message.channel.send("There is no more free games, come back tomorrow")
+        while True:
+            retorno = Gamoo().search_game() 
+            if retorno != None:
+                await message.channel.send(retorno)
+            else:
+                await message.channel.send("There is no more free games, come back tomorrow")
+                break
         return
 
 client.run(token)

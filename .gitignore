@@ -4,4 +4,4 @@ test.py
 token.json
 __pycache__/
 .vscode/
-__pycache__/data.cpython-310.pyc
+*.pyc
